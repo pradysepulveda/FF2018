@@ -34,6 +34,8 @@ aDDM simulations are generated for the model with maximum estimated likelihood.
 from __future__ import absolute_import, division
 
 import numpy as np
+import pandas as pd
+
 import pkg_resources
 
 from builtins import range, str
@@ -50,7 +52,7 @@ from .util import (load_trial_conditions_from_csv, load_data_from_csv,
 def main(rangeD, rangeSigma, rangeTheta, trialsFileName=None,
          expdataFileName=None, fixationsFileName=None, trialsPerSubject=100,
          simulationsPerCondition=800, subjectIds=[], numThreads=9,
-         saveSimulations=False, saveFigures=False, valueDif = np.arange(-5,6,1) , verbose=False, ):
+         saveSimulations=False, saveFigures=False, valueDif = np.arange(-5,6,1) , verbose=False, saveFolder = ''):
     """
     Args:
       rangeD: list of floats, search range for parameter d.
@@ -149,6 +151,26 @@ def main(rangeD, rangeSigma, rangeTheta, trialsFileName=None,
     fixationData = get_empirical_distributions(
         data, subjectIds=subjectIds, useOddTrials=False, useEvenTrials=True, valueDiffs = list(valueDif))
 
+    
+    # PS modification: exclude from trialConditions the ones that are not available for the participants--------------
+  #  part_data = pd.read_csv(expdataFileName)  # Load data
+  #  ParData = part_data.loc[(part_data['parcode'] == int(subjectIds[0])) & (part_data['trial']%2 ==0) ] # extract odd trials from 
+  #  
+  #  toErase = []
+  #  for i in range(0,len(trialConditions)):
+  #      ParData1 = ParData.loc[(ParData['item_left'] == trialConditions[i][0]) & (ParData['item_right'] ==trialConditions[i][1]) ]
+  #      if ParData1.empty:
+  #          toErase.append(i) #identify trial conditions without trials available
+  #  
+  #  print (u"toErase from TrialConditions"+ str (toErase))
+
+  #  for offset, index in enumerate(toErase):
+  #      index -= offset
+  #      del trialConditions[index] #delete these trial conditions
+        
+  #  print (trialConditions)
+    #--------------------    
+    
     # Generate simulations using the even trials fixation distributions and the
     # estimated parameters.
     if verbose:
@@ -170,11 +192,11 @@ def main(rangeD, rangeSigma, rangeTheta, trialsFileName=None,
 
     if saveSimulations:
         save_simulations_to_csv(simulTrials,
-                                u"aDDM_simulations/simul_expdata_" + currTime + u".csv",
-                                u"aDDM_simulations/simul_fixations_" + currTime + u".csv")
+                                u""+saveFolder+"/"+str(subjectIds[0])+"_simul_expdata_" + currTime + u".csv",
+                                u""+saveFolder+"/"+str(subjectIds[0])+"_simul_fixations_" + currTime + u".csv")
 
     if saveFigures:
-        pdfPages = PdfPages(u"aDDM_simulations/addm_fit_" + currTime + u".pdf")
+        pdfPages = PdfPages(u""+saveFolder+"/"+str(subjectIds[0])+"_addm_fit_" + currTime + u".pdf")
         generate_choice_curves(dataTrials, simulTrials, pdfPages,valueDiffRange = valueDif)
       #  generate_rt_curves(dataTrials, simulTrials, pdfPages)
         pdfPages.close()
