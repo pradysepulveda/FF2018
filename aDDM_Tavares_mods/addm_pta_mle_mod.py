@@ -50,7 +50,7 @@ from .util import (load_trial_conditions_from_csv, load_data_from_csv,
 def main(rangeD, rangeSigma, rangeTheta, trialsFileName=None,
          expdataFileName=None, fixationsFileName=None, trialsPerSubject=100,
          simulationsPerCondition=800, subjectIds=[], numThreads=9,
-         saveSimulations=False, saveFigures=False, valueDif = np.arange(-5,6,1) , verbose=False, ):
+         saveSimulations=False, saveFigures=False, valueDif = np.arange(-5,6,1) , verbose=False, saveFolder = u"aDDM_simulations/" ):
     """
     Args:
       rangeD: list of floats, search range for parameter d.
@@ -170,13 +170,13 @@ def main(rangeD, rangeSigma, rangeTheta, trialsFileName=None,
 
     if saveSimulations:
         save_simulations_to_csv(simulTrials,
-                                u"aDDM_simulations/simul_expdata_" + currTime + u".csv",
-                                u"aDDM_simulations/simul_fixations_" + currTime + u".csv")
+                                u"" + saveFolder + "simul_expdata_" + currTime + u".csv",
+                                u"" + saveFolder + "simul_fixations_" + currTime + u".csv")
 
     if saveFigures:
-        pdfPages = PdfPages(u"aDDM_simulations/addm_fit_" + currTime + u".pdf")
+        pdfPages = PdfPages(u"" + saveFolder + "addm_fit_" + currTime + u".pdf")
         generate_choice_curves(dataTrials, simulTrials, pdfPages,valueDiffRange = valueDif)
-      #  generate_rt_curves(dataTrials, simulTrials, pdfPages)
+        generate_rt_curves(dataTrials, simulTrials, pdfPages)
         pdfPages.close()
 
     return optimalParams , min(list(NLL.values()))
